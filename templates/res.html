@@ -110,19 +110,17 @@
     </div>
 
     <div class="text-area-container">
-     congrats lol
+        <h1>Selected Content</h1>
+        <h1>{{ selected_content }}</h1>
+    
+        <h1>Modified Content</h1>
+        <pre>{{ modified_content }}</pre>
     </div>
 
     <script>
                 function runTestingFunction() {
-            // Make a GET request to the "/run_testing_function" route
             fetch('/run_testing_function')
                 .then(response => {
-                    // if (response.ok) {
-                    //     alert('Testing function was executed successfully.');
-                    // } else {
-                    //     alert('Error executing the testing function.');
-                    // }
                 })
                 .catch(error => {
                     console.error('Error:', error);

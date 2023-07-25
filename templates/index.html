@@ -102,9 +102,10 @@
             <input type="number" name="digit" id="digit" required>
             <br>
             <br>
+            <button class="submit">Rasti šerdį</button>
+
         </form>
         <br>
-        <button class="submit" onclick="runTestingFunction()">Rasti šerdį</button>
 
 
     </div>
@@ -135,22 +136,6 @@
     </div>
 
     <script>
-    function runTestingFunction() {
-        // Make a GET request to the "/run_testing_function" route
-        fetch('/run_testing_function')
-            .then(response => {
-                if (response.ok) {
-                    // If the response is successful, redirect the user to the 'testing' endpoint
-                    window.location.href = '/testing';
-                } else {
-                    alert('Error executing the testing function.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error executing the testing function.');
-            });
-    }
         function saveNewFile() {
             const content = document.getElementById("new-content").value;
             const filename = prompt("Enter the filename for the new text file:");
