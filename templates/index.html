@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Text File Uploader and Editor</title>
+    <title>Kursinis</title>
     <style>
         body {
             background-color: beige;
@@ -73,6 +73,10 @@
             border: none;
             cursor: pointer;
         }
+        #file-select option.selected {
+            background-color: #84cd87;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -80,12 +84,11 @@
         <h1>Gretimų kaimynių sąrašas</h1>
         <form method="post" enctype="multipart/form-data">
             Įkelkite naują failą, pasirinkite naudotą anksčiau arba sukurkite naują .txt failą su grafo gretimų kaimynių sąrašu:
-            <input type="file" name="file" id="file" required>
-            <!-- <input type="submit" value="Įkelti failą"> -->
-
-        Anksčiau naudoti failai:
-        <br>
-            <select name="selected_file">
+            <input type="file" name="fileUpl" id="fileUpl" >
+            Anksčiau naudoti failai:
+            <br>
+            <select id="fileOption"  name="selected_file">
+                <option value="" disabled selected>Select a file...</option>
                 {% for file in files %}
                     <option value="{{ file }}">{{ file }}</option>
                 {% endfor %}
@@ -99,11 +102,10 @@
             <br>
             <br>
             <label for="digit">Pasirinkite k:</label>
-            <input type="number" name="digit" id="digit" required>
+            <input value='2' type="number" name="digit" id="digit" required>
             <br>
             <br>
             <button class="submit">Rasti šerdį</button>
-
         </form>
         <br>
 

@@ -1,18 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Text File Uploader and Editor</title>
+    <title>Kursinis</title>
     <style>
         body {
-            background-color: beige;
-            display: flex;
-            flex-direction: row;
+            background-color: beige !important;
         }
-        /* Center the form on the left side */
         .form-container {
+            background-color: beige;
             margin: auto;
             margin-left:10px;
             max-width: 300px;
+        }
+        .linijai{
+            border-bottom: 2px solid #5d5c5c;
+
+        }
+        .main-container {
+            position: absolute;top: 0.5%; left: 25%;right: 15% ; bottom: 70%;            
+            background-color: beige;
+            margin: auto;
+            /* border-bottom: 2px solid #5d5c5c; */
+
+            /* border:1px solid black; */
+
+            /* margin-right:100px; */
+            
         }
         /* Style form elements */
         input[type="file"],
@@ -42,12 +55,11 @@
             border: none;
             cursor: pointer;
         }
-        /* Text area and button container on the right side */
         .text-area-container {
             text-align: center;
-            flex: 1;
+            /* flex: 1; */
             padding: 20px;
-            /* margin-left:300px; */
+            margin-left:300px; 
             flex-direction: column;
             justify-content: space-between;
         }
@@ -59,13 +71,11 @@
             flex-direction: column;
             justify-content: space-between;
         }
-        /* Adjust the height of the textarea */
         textarea {
             width: 100%;
-            height: 150px; /* Adjust the height as needed */
+            height: 150px; 
             box-sizing: border-box;
         }
-        /* Style the button for saving content as a new file */
         .save-btn {
             padding: 8px;
             background-color: #4CAF50;
@@ -73,6 +83,33 @@
             border: none;
             cursor: pointer;
         }
+        .left-column{
+            margin-right: 300px;
+            float: left;
+            width: 40%;
+            margin: 300px auto;
+            background-color: white;
+            margin-right: 10px; /* Add some spacing between the columns */
+            padding: 10px; /* Optionally add some padding */
+            margin: 0 auto; 
+            overflow: auto; 
+            height: 100px;
+            resize: both; 
+            overflow-wrap: break-word; 
+        }
+        .right-column {
+            width: 40%;
+            margin-left: 100px;
+            background-color: white;
+            margin-left: 10px; /* Add some spacing between the columns */
+            padding: 10px; /* Optionally add some padding */
+            margin: 0 auto; 
+            overflow: auto; 
+            height: 100px;
+            resize: both; 
+            overflow-wrap: break-word; 
+        }
+        
     </style>
 </head>
 <body>
@@ -81,44 +118,51 @@
         <form method="post" enctype="multipart/form-data">
             Įkelkite naują failą, pasirinkite naudotą anksčiau arba sukurkite naują .txt failą su grafo gretimų kaimynių sąrašu:
             <input type="file" name="file" id="file" required>
-            <!-- <input type="submit" value="Įkelti failą"> -->
-
-        Anksčiau naudoti failai:
-        <br>
+            Anksčiau naudoti failai:
+            <br>
             <select name="selected_file">
                 {% for file in files %}
                     <option value="{{ file }}">{{ file }}</option>
                 {% endfor %}
             </select>
-            <br>
-            <br>
+            <br><br>
             Sukurkite naują failą:
             <br>
             <textarea id="new-content"></textarea>
-            <br>
-            <br>
-            <br>
+            <br><br><br>
             <label for="digit">Pasirinkite k:</label>
             <input type="number" name="digit" id="digit" required>
-            <br>
-            <br>
+            <br><br>
         </form>
         <br>
-        <button class="submit" onclick="runTestingFunction()">Rasti šerdį</button>
-
-
+        <button class="submit" onclick="runTestingFunction()">Rastai šerdį</button>
     </div>
 
-    <div class="text-area-container">
-        <h1>Selected Content</h1>
-        <h1>{{ selected_content }}</h1>
-    
-        <h1>Modified Content</h1>
-        <pre>{{ modified_content }}</pre>
+    <div class="main-container">
+        <h2>Originalus grafas ir grafo šerdies grafas (k = {{ modified_content }})</h2>
+        <div  class="left-column"> 
+            {% for line in selected_content %}
+                {{ line }}<br>
+            {% endfor %}
+        </div>
+        <div class= "right-column">
+            {% for line in selected_content2 %}
+                {{ line }}<br>
+            {% endfor %}
+        </div>
+        <br>
+        <div class ="linijai"> </div>
+        <h2>Šerdies komponenčių skaičius: {{ komponentes }}</h2>
+        <h2>Komponenčių ilgiai: {{ ilgiausia }}</h2>
+        <br>
+        <div class ="linijai"> </div>
+        <h2>Diagramos</h2>
+        <br>
+        <div class ="linijai"> </div>
     </div>
 
     <script>
-                function runTestingFunction() {
+        function runTestingFunction() {
             fetch('/run_testing_function')
                 .then(response => {
                 })
