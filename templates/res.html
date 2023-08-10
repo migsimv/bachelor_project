@@ -27,7 +27,7 @@
             /* margin-right:100px; */
             
         }
-        /* Style form elements */
+        /* Style form elements */ 
         input[type="file"],
         input[type="submit"] {
             width: 100%;
@@ -109,7 +109,17 @@
             resize: both; 
             overflow-wrap: break-word; 
         }
-        
+        .column {
+  float: left;
+  width: 48%;
+  padding: 10px;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
     </style>
 </head>
 <body>
@@ -152,11 +162,27 @@
         </div>
         <br>
         <div class ="linijai"> </div>
-        <h2>Šerdies komponenčių skaičius: {{ komponentes }}</h2>
-        <h2>Komponenčių ilgiai: {{ ilgiausia }}</h2>
+        <div class="row">
+            <div class="column"  >
+                <h2>Originalaus grafo komponenčių skaičius: {{ komponentes }}</h2>
+                <h2>Komponenčių ilgiai: {{ ilgiausia }}</h2>
+                <h2>Viršūnių skaičius: {{ virsunes }} </h2>
+                <br>
+            </div>
+            <div class="column"  >
+                <h2>Šerdies komponenčių skaičius: {{ komponentes }}</h2>
+                <h2>Komponenčių ilgiai: {{ ilgiausia }}</h2>
+                <h2>Viršūnių skaičius: {{ virsunes }} </h2>
+            </div>
+          </div>
         <br>
         <div class ="linijai"> </div>
         <h2>Diagramos</h2>
+        <br>
+        <img src="data:image/png;base64,{{ plot_data }}" alt="Matplotlib Diagram">
+        <img src="data:image/png;base64,{{ plot_data_before }}" alt="Matplotlib Diagram">
+        <br>
+        <br>
         <br>
         <div class ="linijai"> </div>
     </div>

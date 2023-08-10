@@ -1,5 +1,10 @@
 from flask import Blueprint, url_for,redirect,render_template, request, jsonify, make_response
 import os
+import matplotlib.pyplot as plt
+import base64
+import numpy as np
+
+import io
 views = Blueprint(__name__,'views')
 
 def get_files_in_uploads_folder():
@@ -33,14 +38,7 @@ def getVertexDegrees(graph):
         count.append(len(graph[vertex]))
     return count
 
-def getCore(file, k):
-    graph = {}
-    for line in file:
-        parts = line.split('->')
-        node = int(parts[0])
-        neighbors = list(map(int, parts[1].split()))
-        graph[node] = neighbors
-
+def getCore(graph, k):
     core = graph.copy()
     degrees = getVertexDegrees(core)
     removed = True
@@ -73,24 +71,33 @@ def index():
     if request.method == 'POST':
             print("CCC")
             if  request.form.get('selected_file'):
-                file = read_selected_file_content(request.form.get('selected_file'))
-                a = file
+                a = read_selected_file_content(request.form.get('selected_file'))
             else:
                 file = request.files['fileUpl']
                 a =(file.readlines()).decode('utf-8') 
             b = request.form['digit']
-            core = getCore(a, b)
+
+            graph = {}
+            for line in a:
+              parts = line.split('->')
+              node = int(parts[0])
+              neighbors = list(map(int, parts[1].split()))
+              graph[node] = neighbors
+            core = getCore(graph, b)
             res = getResult(core)
             komp = find_components(core)
-
             ilg = komp[0]
 
             for array in komp:
                 ilg = [len(array) for array in komp]
 
             komp = find_components(core)
-            print(komp)
-            return render_template('res.html', selected_content =res, selected_content2 =a, modified_content=b, komponentes = len(komp), ilgiausia = len(ilg))
+            virsunes = len(core)
+            # plot_data_before = generate_plot(core, 'test5')
+            # plot_data_core = generate_plot(graph, 'test')
+            plot_data_before = 0
+            plot_data_core =0
+            return render_template('res.html',virsunes=virsunes,plot_data_before = plot_data_core, plot_data = plot_data_before, selected_content =a, selected_content2 =res, modified_content=b, komponentes = len(komp), ilgiausia = len(ilg))
     return render_template('index.html', files = files)
 
 def find_components(graph):
@@ -112,3 +119,35 @@ def find_components(graph):
             components.append(component)
 
     return components
+
+def generate_plot(graph, name): #BUG nucrashina po kurio laiko RuntimeError: main thread is not in main loop
+    intervals = []
+    for i in range(0, 1000, 100):
+        intervals.append(i)
+    intervals.append(1000 - 1)
+    degreesArray = []
+    print(graph)
+    for key, value in graph.items():
+        degreesArray.append(len(value))
+    # x = np.arange(0, 1000, 100)
+    # y = np.arange(0, 5000, 200)
+    x = [1, 2, 3, 4, 5]
+    y = [10, 5, 7, 2, 8]
+
+    plt.figure(figsize=(4.5, 4))  
+    plt.plot(x, y)
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.suptitle(name)
+
+    # plt.title('Sample Plot')
+    plt.grid(True)
+
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    plot_data = base64.b64encode(buffer.getvalue()).decode()
+    plt.switch_backend('agg')
+
+    plt.close() 
+    return plot_data
