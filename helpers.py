@@ -2,6 +2,8 @@ import os
 import matplotlib.pyplot as plt
 import base64  
 import io
+import random
+import math
 
 
 def get_files_in_uploads_folder():
@@ -45,7 +47,7 @@ def getResult(graph):
     result = []
     for key, value in graph.items():
         res = (key, "->", value)
-        line = "{} {} {}".format(res[0], res[1], ' '.join(str(x) for x in res[2]))
+        line = "{} {} {}".format(res[0], res[1], ', '.join(str(x) for x in res[2]))
         result.append(line)
     return result
 
@@ -100,3 +102,45 @@ def generate_plot(graph, name): #BUG nucrashina po kurio laiko RuntimeError: mai
 
     plt.close() 
     return plot_data
+
+def longest_inner_array_length(array_of_arrays):
+    longest_length = 0
+    for inner_array in array_of_arrays:
+        current_length = len(inner_array)
+        if current_length > longest_length:
+            longest_length = current_length
+    return longest_length
+
+def getGraph(decoded_lines):
+    graph = {}
+    for line in decoded_lines:
+        parts = line.split('->')
+        node = int(parts[0])
+        neighbors = list(map(int, parts[1].split()))
+        graph[node] = neighbors
+    return graph
+
+def create_bipartite_graph(xArray, yArray, alpha):
+    V = len(xArray) + len(yArray)
+    adj_list = [[] for i in range(V)]
+    for i in range(len(xArray)):
+        f = 0
+        for j in range(len(xArray), V):
+            p = getP(alpha, xArray[i], yArray[f], len(xArray), len(yArray))
+            if random.random() < p:
+                adj_list[i].append(j)
+                adj_list[j].append(i)
+            f += 1
+    return adj_list
+def getP(alpha,x,y,n,m):
+    return alpha * (x*y) / math.sqrt(n*m)
+
+def findConnectedActors(x, graph): 
+    neighbors = {}
+    new_graph = {}
+    for i in range(x):
+        for neighbor in graph[i]:
+            neighbors.setdefault(neighbor, []).append(i)
+    for i in range(x):
+        new_graph[i] = list({n for neighbor in graph[i] for n in neighbors.get(neighbor, {}) if n != i})
+    return new_graph

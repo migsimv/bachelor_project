@@ -38,7 +38,6 @@
             border: none;
             cursor: pointer;
         }
-        /* Text area and button container on the right side */
         .text-area-container {
             text-align: center;
             flex: 1;
@@ -54,14 +53,12 @@
             flex-direction: column;
             justify-content: space-between;
         }
-        /* Adjust the height of the textarea */
         textarea {
             width: 100%;
             padding: 8px;
             margin: 5px 0;
             box-sizing: border-box;
         }
-        /* Style the button for saving content as a new file */
         .save-btn {
             padding: 8px;
             background-color: #4CAF50;
@@ -79,7 +76,7 @@
         }
         th, td {
             padding: 8px;
-            text-align: right; /* Align columns to the right */
+            text-align: right; 
             border: 1px solid black;
         }
     </style>
@@ -87,10 +84,9 @@
 <body>
     <div class="form-container">
         <h1>Gretimų kaimynių sąrašas</h1>
-
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data"  onchange="handleOptionChange()">
             <label for="options">Pasirinkite pradinių duomenų tipą</label>
-            <select id="options" name="options" onchange="handleOptionChange()">
+            <select id="options" name="options">
                 <option value="option1">Gretimų kaimynių sąrašas</option>
                 <option value="option2">Masyvų dydžiai ir jų vienodi svoriai</option>
                 <option value="option3">Du masyvai su svoriais</option>
@@ -99,33 +95,33 @@
             <div id="integerForm" class="hidden">
                 Įveskite duomenis arba įkelkite failą <br>
                 <label for="integerValue">Aktorių skaičius:</label>
-                <input type="number" id="integerValue" name="integerValue">           
+                <input type="number" id="xLen" name="xLen"required>           
                 <br>
                 <label for="integerValue2">Aktorių svoriai: </label>
-                <input type="number" id="integerValue2" name="integerValue2">
+                <input type="number" id="xWeight" name="xWeight" required>
                 <br>
                 <label for="integerValue2">Atributų skaičius:</label>
-                <input type="number" id="integerValue3" name="integerValue3">
+                <input type="number" id="yLen" name="yLen" required>
                 <br>
                 <label for="integerValue4">Atributų svoriai: </label>
-                <input type="number" id="integerValue4" name="integerValue4">
+                <input type="number" id="yWeight" name="yWeight" required>
                 <br>
                 Alpha: 
-                <input type="number" id="alpha" name="alpha">
+                <input type="number" id="alpha" name="alpha" step="0.01">
                 <br> <br>
             </div>
             <div id="listForm" class="hidden">
                 Įveskite duomenis arba įkelkite failą <br>
-                <label for="integerValue">Aktorių svoriai:</label>
-                <textarea id="integerValue" name="integerValue" rows="4" style="height: 100px;"></textarea>
+                <label for="yArray">Aktorių svoriai:</label>
+                <textarea id="xArray" name="xArray" rows="4" style="height: 100px;" required></textarea>
                 <br>
                 <label for="integerValue2">Atributų svoriai: </label>
-                <textarea id="integerValue2" name="integerValue2" rows="4"  style="height: 100px;"></textarea>
+                <textarea id="yArray" name="yArray" rows="4"  style="height: 100px;" required></textarea>
                 Alpha: 
-                <input type="number" id="alpha" name="alpha">
+                <input type="number" id="alpha2" name="alpha2" step="0.01">
                 <br> <br>
-
             </div>
+
             <script>
                 function handleOptionChange() {
                     var selectedOption = document.getElementById("options").value;
@@ -135,14 +131,36 @@
                     if (selectedOption === "option2") {
                         integerForm.classList.remove("hidden");
                         listForm.classList.add("hidden");
+                        enableRequiredFields(integerForm);
+                        disableRequiredFields(listForm);
+
                     } 
                     else if(selectedOption === "option3"){
                         integerForm.classList.add("hidden");
                         listForm.classList.remove("hidden");
+                        disableRequiredFields(integerForm);
+                        enableRequiredFields(listForm)
                     }
                     else {
                         integerForm.classList.add("hidden");
+                        disableRequiredFields(integerForm);
+                        disableRequiredFields(listForm);
+
+
                     }
+                }
+                function enableRequiredFields(form) {
+                    var requiredFields = form.querySelectorAll('[required]');
+                    requiredFields.forEach(field => {
+                        field.required = true;
+                    });
+                }
+
+                function disableRequiredFields(form) {
+                    var requiredFields = form.querySelectorAll('[required]');
+                    requiredFields.forEach(field => {
+                        field.required = false;
+                    });
                 }
             </script>
             Įkelkite naują failą, pasirinkite naudotą anksčiau arba sukurkite naują .txt failą su grafo gretimų kaimynių sąrašu:
@@ -162,14 +180,10 @@
 
             <label for="digit">Pasirinkite k:</label>
             <input value='2' type="number" name="digit" id="digit" required>
-            <br>
-            <br>
-            
+            <br><br>
             <button class="submit" onclick="uploadFile()">Rasti šerdį</button>
         </form>
         <br>
-
-
     </div>
 
     <div class="text-area-container">
@@ -200,7 +214,7 @@
     <script>
         function uploadFile() {
             const fileInput = document.getElementById("fileUpl");
-            const selectedFile = fileInput.files[0]; // Get the selected file
+            const selectedFile = fileInput.files[0]; 
     
             if (selectedFile) {
                 const formData = new FormData();
@@ -221,12 +235,8 @@
                     console.error('Error:', error);
                     alert('Error uploading file.');
                 });
-            } else {
-                alert("Please select a file before uploading.");
             }
         }
-    </script>
-    
     </script>
 </body>
 </html>

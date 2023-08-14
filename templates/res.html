@@ -110,16 +110,16 @@
             overflow-wrap: break-word; 
         }
         .column {
-  float: left;
-  width: 40%;
-  padding: 10px;
-}
+            float: left;
+            width: 45%;
+            padding: 10px;
+        }
 
-.row:after {
-  content: "";
-  display: table;
-  clear: both;
-}
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
     </style>
 </head>
 <body>
@@ -149,14 +149,14 @@
     </div>
 
     <div class="main-container">
-        <h2>Originalus grafas ir grafo šerdies grafas (k = {{ modified_content }})</h2>
+        <h2>Pradinis grafas ir grafo šerdies grafas (k = {{ data['k'] }})</h2>
         <div  class="left-column"> 
-            {% for line in selected_content %}
+            {% for line in data['originalGraph'] %}
                 {{ line }}<br>
             {% endfor %}
         </div>
         <div class= "right-column">
-            {% for line in selected_content2 %}
+            {% for line in data['coreToPrint'] %}
                 {{ line }}<br>
             {% endfor %}
         </div>
@@ -164,15 +164,15 @@
         <div class ="linijai"> </div>
         <div class="row">
             <div class="column"  >
-                <h2>Originalaus grafo komponenčių skaičius: {{ komponentes }}</h2>
-                <h2>Komponenčių ilgiai: {{ ilgiausia }}</h2>
-                <h2>Viršūnių skaičius: {{ virsunes }} </h2>
+                <h2>Pradinio grafo komponenčių skaičius: {{ data['graphComponents'] }}</h2>
+                <h2>Didžiausios komponentės dydis: {{ data['maxGraphComponent'] }}</h2>
+                <h2>Viršūnių skaičius: {{ data['graphVertices'] }} </h2>
                 <br>
             </div>
             <div class="column"  >
-                <h2>Šerdies komponenčių skaičius: {{ komponentes }}</h2>
-                <h2>Komponenčių ilgiai: {{ ilgiausia }}</h2>
-                <h2>Viršūnių skaičius: {{ virsunes }} </h2>
+                <h2>Šerdies komponenčių skaičius: {{ data['coreComponents'] }}</h2>
+                <h2>Didžiausios komponentės dydis: {{ data['maxCoreComponent'] }}</h2>
+                <h2>Viršūnių skaičius: {{ data['coreVertices'] }} </h2>
             </div>
           </div>
         <br>
