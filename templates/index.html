@@ -8,29 +8,25 @@
             display: flex;
             flex-direction: row;
         }
-        /* Center the form on the left side */
+        .hidden {
+            display: none;
+        }
         .form-container {
             margin: auto;
             margin-left:10px;
             max-width: 300px;
+            border-right: 2px solid #5d5c5c;
+            padding-right: 20px;
         }
-        /* Style form elements */
+ 
         input[type="file"],
-        input[type="submit"] {
+        input[type="submit"]
+        input[type="number"] {
             width: 100%;
             padding: 8px;
             margin: 5px 0;
-            box-sizing: border-box;
-        }
-        input[type="submit"] {
-            background-color: #84cd87;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        .form-container {
-            border-right: 2px solid #5d5c5c;
-            padding-right: 20px;
+            box-sizing:border-box;
+            align-items:center;
         }
         button{
             background-color: #4CAF50;
@@ -47,7 +43,6 @@
             text-align: center;
             flex: 1;
             padding: 20px;
-            /* margin-left:300px; */
             flex-direction: column;
             justify-content: space-between;
         }
@@ -62,7 +57,8 @@
         /* Adjust the height of the textarea */
         textarea {
             width: 100%;
-            height: 150px; /* Adjust the height as needed */
+            padding: 8px;
+            margin: 5px 0;
             box-sizing: border-box;
         }
         /* Style the button for saving content as a new file */
@@ -77,14 +73,82 @@
             background-color: #84cd87;
             color: white;
         }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 8px;
+            text-align: right; /* Align columns to the right */
+            border: 1px solid black;
+        }
     </style>
 </head>
 <body>
     <div class="form-container">
         <h1>Gretimų kaimynių sąrašas</h1>
+
         <form method="post" enctype="multipart/form-data">
+            <label for="options">Pasirinkite pradinių duomenų tipą</label>
+            <select id="options" name="options" onchange="handleOptionChange()">
+                <option value="option1">Gretimų kaimynių sąrašas</option>
+                <option value="option2">Masyvų dydžiai ir jų vienodi svoriai</option>
+                <option value="option3">Du masyvai su svoriais</option>
+            </select>
+            <br><br>
+            <div id="integerForm" class="hidden">
+                Įveskite duomenis arba įkelkite failą <br>
+                <label for="integerValue">Aktorių skaičius:</label>
+                <input type="number" id="integerValue" name="integerValue">           
+                <br>
+                <label for="integerValue2">Aktorių svoriai: </label>
+                <input type="number" id="integerValue2" name="integerValue2">
+                <br>
+                <label for="integerValue2">Atributų skaičius:</label>
+                <input type="number" id="integerValue3" name="integerValue3">
+                <br>
+                <label for="integerValue4">Atributų svoriai: </label>
+                <input type="number" id="integerValue4" name="integerValue4">
+                <br>
+                Alpha: 
+                <input type="number" id="alpha" name="alpha">
+                <br> <br>
+            </div>
+            <div id="listForm" class="hidden">
+                Įveskite duomenis arba įkelkite failą <br>
+                <label for="integerValue">Aktorių svoriai:</label>
+                <textarea id="integerValue" name="integerValue" rows="4" style="height: 100px;"></textarea>
+                <br>
+                <label for="integerValue2">Atributų svoriai: </label>
+                <textarea id="integerValue2" name="integerValue2" rows="4"  style="height: 100px;"></textarea>
+                Alpha: 
+                <input type="number" id="alpha" name="alpha">
+                <br> <br>
+
+            </div>
+            <script>
+                function handleOptionChange() {
+                    var selectedOption = document.getElementById("options").value;
+                    var integerForm = document.getElementById("integerForm");
+                    var listForm = document.getElementById("listForm");
+
+                    if (selectedOption === "option2") {
+                        integerForm.classList.remove("hidden");
+                        listForm.classList.add("hidden");
+                    } 
+                    else if(selectedOption === "option3"){
+                        integerForm.classList.add("hidden");
+                        listForm.classList.remove("hidden");
+                    }
+                    else {
+                        integerForm.classList.add("hidden");
+                    }
+                }
+            </script>
             Įkelkite naują failą, pasirinkite naudotą anksčiau arba sukurkite naują .txt failą su grafo gretimų kaimynių sąrašu:
-            <input type="file" name="fileUpl" id="fileUpl" >
+            <input type="file" name="fileUpl" id="fileUpl" accept=".txt">
+
+            <br>
             Anksčiau naudoti failai:
             <br>
             <select id="fileOption"  name="selected_file">
@@ -95,17 +159,13 @@
             </select>
             <br>
             <br>
-            Sukurkite naują failą:
-            <br>
-            <textarea id="new-content"></textarea>
-            <br>
-            <br>
-            <br>
+
             <label for="digit">Pasirinkite k:</label>
             <input value='2' type="number" name="digit" id="digit" required>
             <br>
             <br>
-            <button class="submit">Rasti šerdį</button>
+            
+            <button class="submit" onclick="uploadFile()">Rasti šerdį</button>
         </form>
         <br>
 
@@ -119,7 +179,7 @@
         <br>
         1. Pasirinkite failą su gretimų viršūnių sąrašu, jau naudotą failą rasite 'Anksčiau naudoti failai' sąraše
         arba galite sukurti naują failą. Failo struktūra turi atrodyti taip: '1 -> 2, 4', čia 1 yra viršūnės pavadinimas, o 2 ir 4
-        tos viršūnės kaimynės, kiekviena viršūnė aprašoma nauja eilute.
+        tos viršūnės kaimynės, kiekviena viršūnė aprašoma nauja eilute.'
         <br>
         2. Pasirinkite k.
         <br>
@@ -138,30 +198,35 @@
     </div>
 
     <script>
-        function saveNewFile() {
-            const content = document.getElementById("new-content").value;
-            const filename = prompt("Enter the filename for the new text file:");
-            if (filename !== null && filename.trim() !== "") {
+        function uploadFile() {
+            const fileInput = document.getElementById("fileUpl");
+            const selectedFile = fileInput.files[0]; // Get the selected file
+    
+            if (selectedFile) {
                 const formData = new FormData();
-                formData.append('filename', filename);
-                formData.append('content', content);
-                fetch('/save_new_file', {
+                formData.append('fileUpl', selectedFile);
+    
+                fetch('/upload_file', {
                     method: 'POST',
                     body: formData
                 })
                 .then(response => {
                     if (response.ok) {
-                        alert(`New file "${filename}" saved successfully.`);
+                        alert("File uploaded successfully.");
                     } else {
-                        alert(`Error saving the new file.`);
+                        alert("Error uploading file.");
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Error saving the new file.');
+                    alert('Error uploading file.');
                 });
+            } else {
+                alert("Please select a file before uploading.");
             }
         }
+    </script>
+    
     </script>
 </body>
 </html>
