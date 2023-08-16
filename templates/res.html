@@ -6,6 +6,9 @@
         body {
             background-color: beige !important;
         }
+        .hidden{
+            display:none
+        }
         .form-container {
             background-color: beige;
             margin: auto;
@@ -19,15 +22,8 @@
         .main-container {
             position: absolute;top: 0.5%; left: 25%;right: 15% ; bottom: 70%;            
             background-color: beige;
-            margin: auto;
-            /* border-bottom: 2px solid #5d5c5c; */
-
-            /* border:1px solid black; */
-
-            /* margin-right:100px; */
-            
+            margin: auto;            
         }
-        /* Style form elements */ 
         input[type="file"],
         input[type="submit"] {
             width: 100%;
@@ -41,6 +37,10 @@
             border: none;
             cursor: pointer;
         }
+        .small-image {
+        width: 450px;
+        height: auto;
+    }
         .form-container {
             border-right: 2px solid #5d5c5c;
             padding-right: 20px;
@@ -57,7 +57,6 @@
         }
         .text-area-container {
             text-align: center;
-            /* flex: 1; */
             padding: 20px;
             margin-left:300px; 
             flex-direction: column;
@@ -89,8 +88,8 @@
             width: 40%;
             margin: 300px auto;
             background-color: white;
-            margin-right: 10px; /* Add some spacing between the columns */
-            padding: 10px; /* Optionally add some padding */
+            margin-right: 10px; 
+            padding: 10px; 
             margin: 0 auto; 
             overflow: auto; 
             height: 100px;
@@ -101,8 +100,8 @@
             width: 40%;
             margin-left: 100px;
             background-color: white;
-            margin-left: 10px; /* Add some spacing between the columns */
-            padding: 10px; /* Optionally add some padding */
+            margin-left: 10px; 
+            padding: 10px;
             margin: 0 auto; 
             overflow: auto; 
             height: 100px;
@@ -114,7 +113,6 @@
             width: 45%;
             padding: 10px;
         }
-
         .row:after {
             content: "";
             display: table;
@@ -125,27 +123,110 @@
 <body>
     <div class="form-container">
         <h1>Gretimų kaimynių sąrašas</h1>
-        <form method="post" enctype="multipart/form-data">
-            Įkelkite naują failą, pasirinkite naudotą anksčiau arba sukurkite naują .txt failą su grafo gretimų kaimynių sąrašu:
-            <input type="file" name="file" id="file" required>
-            Anksčiau naudoti failai:
-            <br>
-            <select name="selected_file">
-                {% for file in files %}
-                    <option value="{{ file }}">{{ file }}</option>
-                {% endfor %}
+        <form method="post" enctype="multipart/form-data"  onchange="handleOptionChange()">
+            <label for="options">Pasirinkite pradinių duomenų tipą</label>
+            <select id="options" name="options">
+                <option value="option1">1. Gretimų kaimynių sąrašas</option>
+                <option value="option2">2. Aktorių ir atributų skaičius su vienodais svoriais</option>
+                <option value="option3">3. Aktorių ir atributų svoriai</option>
             </select>
             <br><br>
-            Sukurkite naują failą:
-            <br>
-            <textarea id="new-content"></textarea>
-            <br><br><br>
-            <label for="digit">Pasirinkite k:</label>
-            <input type="number" name="digit" id="digit" required>
+            <div id="integerForm" class="hidden">
+                Įveskite duomenis:<br>
+                <label for="integerValue">Aktorių skaičius:</label>
+                <input type="number" id="xLen" name="xLen"required>           
+                <br>
+                <label for="integerValue2">Aktorių svoriai: </label>
+                <input type="number" id="xWeight" name="xWeight" required>
+                <br>
+                <label for="integerValue2">Atributų skaičius:</label>
+                <input type="number" id="yLen" name="yLen" required>
+                <br>
+                <label for="integerValue4">Atributų svoriai: </label>
+                <input type="number" id="yWeight" name="yWeight" required>
+                <br>
+                α: 
+                <input type="number" id="alpha" name="alpha" step="0.01">
+                <br> <br>
+            </div>
+            <div id="listForm" class="hidden">
+                Įveskite duomenis arba įkelkite failą <br>
+                <label for="yArray">Aktorių svoriai:</label>
+                <textarea id="xArray" name="xArray" rows="4" style="height: 100px;" required></textarea>
+                <br>
+                <label for="integerValue2">Atributų svoriai: </label>
+                <textarea id="yArray" name="yArray" rows="4"  style="height: 100px;" required></textarea>
+                α: 
+                <input type="number" id="alpha2" name="alpha2" step="0.01">
+                <br> <br>
+            </div>
+
+            <script>
+                function handleOptionChange() {
+                    var selectedOption = document.getElementById("options").value;
+                    var integerForm = document.getElementById("integerForm");
+                    var listForm = document.getElementById("listForm");
+                    var listFormPrev = document.getElementById("listFormPrev");
+
+                    if (selectedOption === "option2") {
+                        integerForm.classList.remove("hidden");
+                        listFormPrev.classList.add("hidden");
+                        listForm.classList.add("hidden");
+                        enableRequiredFields(integerForm);
+                        disableRequiredFields(listForm);
+                    } 
+                    else if(selectedOption === "option3"){
+                        integerForm.classList.add("hidden");
+                        listFormPrev.classList.add("hidden");
+                        listForm.classList.remove("hidden");
+                        disableRequiredFields(integerForm);
+                        enableRequiredFields(listForm)
+                    }
+                    else {
+                        integerForm.classList.add("hidden");
+                        listForm.classList.add("hidden");
+                        listFormPrev.classList.remove("hidden");
+                        disableRequiredFields(integerForm);
+                        disableRequiredFields(listForm);
+                        enableRequiredFields(listFormPrev);
+                    }
+                }
+
+                function enableRequiredFields(form) {
+                    var requiredFields = form.querySelectorAll('[required]');
+                    requiredFields.forEach(field => {
+                        field.required = true;
+                    });
+                }
+
+                function disableRequiredFields(form) {
+                    var requiredFields = form.querySelectorAll('[required]');
+                    requiredFields.forEach(field => {
+                        field.required = false;
+                    });
+                }
+            </script>
+            
+            <div id="listFormPrev">
+                Įkelkite naują failą, pasirinkite naudotą anksčiau arba sukurkite naują .txt failą su grafo gretimų kaimynių sąrašu:
+                <input type="file" name="fileUpl" id="fileUpl" accept=".txt">
+                <br>
+                Anksčiau naudoti failai:
+                <br>
+                <select id="fileOption"  name="selected_file">
+                    <option value="" disabled selected>Pasirinkite failą</option>
+                    {% for file in files %}
+                        <option value="{{ file }}">{{ file }}</option>
+                    {% endfor %}
+                </select>
+                <br><br>
+            </div>
+            <label for="digit">k:</label>
+            <input value='2' type="number" name="digit" id="digit" required>
             <br><br>
+            <button class="submit" onclick="uploadFile()">Rasti šerdį</button>
         </form>
         <br>
-        <button class="submit" onclick="runTestingFunction()">Rastai šerdį</button>
     </div>
 
     <div class="main-container">
@@ -177,13 +258,11 @@
           </div>
         <br>
         <div class ="linijai"> </div>
-        <h2>Diagramos</h2>
+        <h2>Histogramos</h2>
         <br>
-        <img src="data:image/png;base64,{{ plot_data }}" alt="Matplotlib Diagram">
-        <img src="data:image/png;base64,{{ plot_data_before }}" alt="Matplotlib Diagram">
-        <br>
-        <br>
-        <br>
+        <img src="{{ url_for('static', filename=data['plot_filename1']) }}" alt="Generated Plot 1" class="small-image">
+        <img src="{{ url_for('static', filename=data['plot_filename2'] )}}" alt="Generated Plot 2" class="small-image">
+        <br><br><br>
         <div class ="linijai"> </div>
     </div>
 
@@ -197,6 +276,7 @@
                     alert('Error executing the testing function.');
                 });
             }
+            
         function saveNewFile() {
             const content = document.getElementById("new-content").value;
             const filename = prompt("Enter the filename for the new text file:");

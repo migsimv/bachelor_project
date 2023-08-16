@@ -1,10 +1,8 @@
 import os
-import matplotlib.pyplot as plt
-import base64  
-import io
+import matplotlib
+matplotlib.use('TkAgg')
 import random
 import math
-
 
 def get_files_in_uploads_folder():
     uploads_folder = "uploads"  
@@ -15,7 +13,6 @@ def read_selected_file_content(selected_file):
     with open(os.path.join("uploads", selected_file), 'r') as f:
         content = f.readlines()
     return [line.strip() for line in content]
-
         
 def getVertexDegrees(graph):
     count = []
@@ -71,37 +68,6 @@ def find_components(graph):
 
     return components
 
-def generate_plot(graph, name): #BUG nucrashina po kurio laiko RuntimeError: main thread is not in main loop
-    intervals = []
-    for i in range(0, 1000, 100):
-        intervals.append(i)
-    intervals.append(1000 - 1)
-    degreesArray = []
-    print(graph)
-    for key, value in graph.items():
-        degreesArray.append(len(value))
-    # x = np.arange(0, 1000, 100)
-    # y = np.arange(0, 5000, 200)
-    x = [1, 2, 3, 4, 5]
-    y = [10, 5, 7, 2, 8]
-
-    plt.figure(figsize=(4.5, 4))  
-    plt.plot(x, y)
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    plt.suptitle(name)
-
-    # plt.title('Sample Plot')
-    plt.grid(True)
-
-    buffer = io.BytesIO()
-    plt.savefig(buffer, format='png')
-    buffer.seek(0)
-    plot_data = base64.b64encode(buffer.getvalue()).decode()
-    plt.switch_backend('agg')
-
-    plt.close() 
-    return plot_data
 
 def longest_inner_array_length(array_of_arrays):
     longest_length = 0
@@ -132,6 +98,7 @@ def create_bipartite_graph(xArray, yArray, alpha):
                 adj_list[j].append(i)
             f += 1
     return adj_list
+
 def getP(alpha,x,y,n,m):
     return alpha * (x*y) / math.sqrt(n*m)
 

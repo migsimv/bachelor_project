@@ -66,6 +66,9 @@
             border: none;
             cursor: pointer;
         }
+        .tab2 {
+            tab-size: 4;
+        }
         #file-select option.selected {
             background-color: #84cd87;
             color: white;
@@ -87,13 +90,13 @@
         <form method="post" enctype="multipart/form-data"  onchange="handleOptionChange()">
             <label for="options">Pasirinkite pradinių duomenų tipą</label>
             <select id="options" name="options">
-                <option value="option1">Gretimų kaimynių sąrašas</option>
-                <option value="option2">Masyvų dydžiai ir jų vienodi svoriai</option>
-                <option value="option3">Du masyvai su svoriais</option>
+                <option value="option1">1. Gretimų kaimynių sąrašas</option>
+                <option value="option2">2. Aktorių ir atributų skaičius su vienodais svoriais</option>
+                <option value="option3">3. Aktorių ir atributų svoriai</option>
             </select>
             <br><br>
             <div id="integerForm" class="hidden">
-                Įveskite duomenis arba įkelkite failą <br>
+                Įveskite duomenis:<br>
                 <label for="integerValue">Aktorių skaičius:</label>
                 <input type="number" id="xLen" name="xLen"required>           
                 <br>
@@ -106,7 +109,7 @@
                 <label for="integerValue4">Atributų svoriai: </label>
                 <input type="number" id="yWeight" name="yWeight" required>
                 <br>
-                Alpha: 
+                α: 
                 <input type="number" id="alpha" name="alpha" step="0.01">
                 <br> <br>
             </div>
@@ -117,7 +120,7 @@
                 <br>
                 <label for="integerValue2">Atributų svoriai: </label>
                 <textarea id="yArray" name="yArray" rows="4"  style="height: 100px;" required></textarea>
-                Alpha: 
+                α: 
                 <input type="number" id="alpha2" name="alpha2" step="0.01">
                 <br> <br>
             </div>
@@ -127,28 +130,32 @@
                     var selectedOption = document.getElementById("options").value;
                     var integerForm = document.getElementById("integerForm");
                     var listForm = document.getElementById("listForm");
+                    var listFormPrev = document.getElementById("listFormPrev");
 
                     if (selectedOption === "option2") {
                         integerForm.classList.remove("hidden");
+                        listFormPrev.classList.add("hidden");
                         listForm.classList.add("hidden");
                         enableRequiredFields(integerForm);
                         disableRequiredFields(listForm);
-
                     } 
                     else if(selectedOption === "option3"){
                         integerForm.classList.add("hidden");
+                        listFormPrev.classList.add("hidden");
                         listForm.classList.remove("hidden");
                         disableRequiredFields(integerForm);
                         enableRequiredFields(listForm)
                     }
                     else {
                         integerForm.classList.add("hidden");
+                        listForm.classList.add("hidden");
+                        listFormPrev.classList.remove("hidden");
                         disableRequiredFields(integerForm);
                         disableRequiredFields(listForm);
-
-
+                        enableRequiredFields(listFormPrev);
                     }
                 }
+
                 function enableRequiredFields(form) {
                     var requiredFields = form.querySelectorAll('[required]');
                     requiredFields.forEach(field => {
@@ -163,22 +170,22 @@
                     });
                 }
             </script>
-            Įkelkite naują failą, pasirinkite naudotą anksčiau arba sukurkite naują .txt failą su grafo gretimų kaimynių sąrašu:
-            <input type="file" name="fileUpl" id="fileUpl" accept=".txt">
-
-            <br>
-            Anksčiau naudoti failai:
-            <br>
-            <select id="fileOption"  name="selected_file">
-                <option value="" disabled selected>Select a file...</option>
-                {% for file in files %}
-                    <option value="{{ file }}">{{ file }}</option>
-                {% endfor %}
-            </select>
-            <br>
-            <br>
-
-            <label for="digit">Pasirinkite k:</label>
+            
+            <div id="listFormPrev">
+                Įkelkite naują failą, pasirinkite naudotą anksčiau arba sukurkite naują .txt failą su grafo gretimų kaimynių sąrašu:
+                <input type="file" name="fileUpl" id="fileUpl" accept=".txt">
+                <br>
+                Anksčiau naudoti failai:
+                <br>
+                <select id="fileOption"  name="selected_file">
+                    <option value="" disabled selected>Pasirinkite failą</option>
+                    {% for file in files %}
+                        <option value="{{ file }}">{{ file }}</option>
+                    {% endfor %}
+                </select>
+                <br><br>
+            </div>
+            <label for="digit">k:</label>
             <input value='2' type="number" name="digit" id="digit" required>
             <br><br>
             <button class="submit" onclick="uploadFile()">Rasti šerdį</button>
@@ -189,26 +196,33 @@
     <div class="text-area-container">
       <h1>Grafo k - šerdies radimas</h1>
       <div class="test">
-        <b>Naudojimas: </b>
-        <br>
-        1. Pasirinkite failą su gretimų viršūnių sąrašu, jau naudotą failą rasite 'Anksčiau naudoti failai' sąraše
-        arba galite sukurti naują failą. Failo struktūra turi atrodyti taip: '1 -> 2, 4', čia 1 yra viršūnės pavadinimas, o 2 ir 4
-        tos viršūnės kaimynės, kiekviena viršūnė aprašoma nauja eilute.'
+        <b>Kas tai?</b>
+        <br> Šis įrankis yra skirtas grafo šerdies radimui. Galima ieškoti grafo šerdies pagal gretimų viršūnių sąrašą arba galima susikonstruoti socialinį tinklą, 
+            jo generavimui paduodami tik viršūnių svoriai ir nurodomas kintamasis α, kuo didesnė α reikšmė, tuo grafas bus jungesnis. 
+        <br><br><b>Naudojimas: </b><br>
+        <dt> 1. Pasirenkamas pradinių duomenų tipas:</dt>
+        <dd> I. Gretimų kaimynių sąrašas - reikia pasirinkti failą (anksčiau naudotas failą galima rasti "Anksčiau naudoti failai" sąraše).
+                Kiekviena viršūnė aprašoma nauja eilute, pvz: '1 -> 4, 5, 7', čia 1 - viršūnės pavadinimas, o 4, 5, 7 yra jos kaimynės. </dd>
+        <dd > II. Aktorių ir atributų skaičius su vienodais svoriais - nurodomas aktorių skaičius ir jų svoris bei atributų skaičius ir jų svoris. Taip pat nurodoma 
+                 α reikšmė, pagal šį kintamajį kis grafo jungumas, kuo α didesnis, tuo grafas bus jungesnis. </dd>
+        <dd>III. Aktorių ir atributų sąrašai su svoriais - įvedami du sąrašai: vienas aktorių svoriams, kitas atributų svoriams. Kiekvienas skaičius atitinka 
+           tos pozicijos viršūnės svorį. Taip pat nurodoma  α reikšmė, pagal šį kintamajį kis grafo jungumas, kuo α didesnis, tuo grafas bus jungesnis.</dd>
+        <b> + II ir III tipai sukuria dvidalį grafą pagal duotus svorius bei α reikšmę (kuo α didesnis, tuo grafas bus jungesnis), o iš to dvidalio grafo 
+                gaunamas socialinis tinklas (aktorių grafas), kurio viršūnės bus jungios jei turės bendrų atributų. Rezultate yra nagrinėjamas socialinio tinklo šerdis.</b>
         <br>
         2. Pasirinkite k.
         <br>
         3. Spauskite mygtuką "Rasti šerdį"
         <br><br>
-        <b>Rezultatai: </b> <br>
-        1. Tekstinis failas su šerdies gretimų kaimynių sąrašu
+        <b>Rezultatai: </b><br>
+        1. Gretimų kaimynių sąrašas
         <br>
-        2. Diagramos su informacija apie šerdį.
+        2. Viršūnių laipsnių histograma paal viršūnės skaičių.
         <br>
         3. Informacija apie komponentes bei jų skaičių.
         <br>
-        4. Dar bus pildoma.
+        4. Viršūnių skaičius.
       </div>
-      
     </div>
 
     <script>

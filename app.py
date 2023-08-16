@@ -1,8 +1,14 @@
-from flask import Flask, request, jsonify
-from views import views 
+from flask import Flask
+from views import views
+import sys
 
-app = Flask(__name__)
+app = Flask(__name__,  static_url_path='/static')
 app.register_blueprint(views, url_prefix="/")
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+    sys.stdout.reconfigure(line_buffering=True)  
+
+    app.debug = True  
+    
+    from werkzeug.serving import run_simple
+    run_simple('localhost', 8000, app, use_reloader=True)

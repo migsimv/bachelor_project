@@ -1,7 +1,16 @@
 from flask import Blueprint, render_template, request
 import helpers
+import matplotlib
+matplotlib.use('Agg') 
+from matplotlib import pyplot as plt
+import time
+import numpy as np
+import threading
 
+plot_lock = threading.Lock()
 views = Blueprint(__name__,'views')
+
+last_generated_plots = []  
 
 @views.route('/upload_file', methods=['POST'])
 def upload_file_route():
@@ -64,11 +73,46 @@ def index():
             data = get_result_from_adj_list(graph, k)
             data['k'] = k
             data['originalGraph'] =  helpers.getResult(graph)
-            # plot_data_before = generate_plot(core, 'test5')
-            # plot_data_core = generate_plot(graph, 'test')
-            plot_data_before = 0
-            plot_data_core =0
-            # print(data['originalGraph'])
-            # print(data['coreToPrint'])
+
+            degreesArray = []
+            for key, value in graph.items():
+                degreesArray.append(len(value))
+            coreDegreesArray = []
+            for key, value in graph.items():
+                coreDegreesArray.append(len(value))
+            data['plot_filename1'] = generate_plot(degreesArray, 'Aktorių grafo viršūnių laipsniai')
+            data['plot_filename2'] = generate_plot(coreDegreesArray, 'Šerdies viršūnių laipsniai')
+            
             return render_template('res.html', files=files, data=data)
     return render_template('index.html', files = files)
+
+def generate_plot(arr, subtitle):
+    with plot_lock:
+        intervals = []
+        for i in range(0, 1000, 100):
+            intervals.append(i)
+        intervals.append(1000 - 1)
+
+        x = np.arange(0, 1000, 100)
+        y = np.arange(0, 5000, 200)
+        plt.xticks(x)
+        plt.yticks(y)
+
+        counts, edges, bars = plt.hist(arr, intervals, edgecolor='k')
+        plt.bar_label(bars)
+        plt.suptitle(subtitle)
+        plt.xlabel('Viršūnės laipsnis')
+        plt.ylabel('Viršūnių skaičius')
+
+        timestamp = int(time.time())
+        if (subtitle == 'Šerdies viršūnių laipsniai' ):
+            filename='histogram_{timestamp}aaa.jpg'
+            plot_filename = f'static/{filename}'
+        else:
+            filename='histogram_{timestamp}.jpg'
+            plot_filename = f'static/{filename}'
+
+        plt.savefig(plot_filename, format='jpeg', dpi=300)
+        plt.close()
+    
+        return filename
