@@ -88,6 +88,7 @@ def getGraph(decoded_lines):
 
 def create_bipartite_graph(xArray, yArray, alpha):
     V = len(xArray) + len(yArray)
+    # random.seed(42)
     adj_list = [[] for i in range(V)]
     for i in range(len(xArray)):
         f = 0

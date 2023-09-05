@@ -6,7 +6,8 @@ from matplotlib import pyplot as plt
 import time
 import numpy as np
 import threading
-
+import networkx
+a = networkx.k_core
 plot_lock = threading.Lock()
 views = Blueprint(__name__,'views')
 
@@ -23,6 +24,8 @@ def upload_file_route():
 
 def get_result_from_adj_list(graph, k):
     data = {}
+    # graphComponents = []
+    # coreComponents = []
     graphComponents = helpers.find_components(graph)
     data["graphComponents"] =len( graphComponents)
     data["graphVertices"] = len(graph)
@@ -82,7 +85,7 @@ def index():
                 coreDegreesArray.append(len(value))
             data['plot_filename1'] = generate_plot(degreesArray, 'Aktorių grafo viršūnių laipsniai')
             data['plot_filename2'] = generate_plot(coreDegreesArray, 'Šerdies viršūnių laipsniai')
-            
+            \
             return render_template('res.html', files=files, data=data)
     return render_template('index.html', files = files)
 
