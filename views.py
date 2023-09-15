@@ -6,8 +6,7 @@ from matplotlib import pyplot as plt
 import time
 import numpy as np
 import threading
-import networkx
-a = networkx.k_core
+import networkx as nx
 plot_lock = threading.Lock()
 views = Blueprint(__name__,'views')
 
@@ -24,13 +23,19 @@ def upload_file_route():
 
 def get_result_from_adj_list(graph, k):
     data = {}
-    # graphComponents = []
-    # coreComponents = []
     graphComponents = helpers.find_components(graph)
     data["graphComponents"] =len( graphComponents)
     data["graphVertices"] = len(graph)
     data["maxGraphComponent"] = helpers.longest_inner_array_length(graphComponents)
-    data["core"] = helpers.getCore(graph, k)
+    graphnx = nx.Graph()
+    graphnx.add_nodes_from(graph)
+    for vertex, neigbors in graph.items():
+        for neighbor in neigbors:
+            graphnx.add_edge(vertex, neighbor)
+    core2= nx.k_core(graphnx, int(k))
+    data["core"] = nx.to_dict_of_lists(core2)
+
+    # data["core"] = helpers.getCore(graph, k)
     data["coreToPrint"] = helpers.getResult(data["core"])
     data["coreVertices"] = len(data["core"])
     coreComponents = helpers.find_components(data["core"])
@@ -81,22 +86,22 @@ def index():
             for key, value in graph.items():
                 degreesArray.append(len(value))
             coreDegreesArray = []
-            for key, value in graph.items():
+            for key, value in data["core"].items():
                 coreDegreesArray.append(len(value))
             data['plot_filename1'] = generate_plot(degreesArray, 'Aktorių grafo viršūnių laipsniai')
             data['plot_filename2'] = generate_plot(coreDegreesArray, 'Šerdies viršūnių laipsniai')
-            \
+            
             return render_template('res.html', files=files, data=data)
     return render_template('index.html', files = files)
 
 def generate_plot(arr, subtitle):
     with plot_lock:
         intervals = []
-        for i in range(0, 1000, 100):
+        for i in range(0, 30, 3):
             intervals.append(i)
-        intervals.append(1000 - 1)
+        # intervals.append(1000 - 1)
 
-        x = np.arange(0, 1000, 100)
+        x = np.arange(0, 30, 3)
         y = np.arange(0, 5000, 200)
         plt.xticks(x)
         plt.yticks(y)

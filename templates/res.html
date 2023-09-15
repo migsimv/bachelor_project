@@ -289,11 +289,7 @@
                     body: formData
                 })
                 .then(response => {
-                    if (response.ok) {
-                        alert(`New file "${filename}" saved successfully.`);
-                    } else {
-                        alert(`Error saving the new file.`);
-                    }
+
                 })
                 .catch(error => {
                     console.error('Error:', error);

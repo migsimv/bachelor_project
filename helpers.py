@@ -30,6 +30,7 @@ def getCore(graph, k):
         for i in range(len(graph)):
             if degrees[i] < int(k) and degrees[i] > 0:
                 for neighbor in core[i]:
+                    print(i)
                     core[neighbor].remove(i)
                     degrees[neighbor] -= 1
                 core.pop(i)
@@ -82,7 +83,7 @@ def getGraph(decoded_lines):
     for line in decoded_lines:
         parts = line.split('->')
         node = int(parts[0])
-        neighbors = list(map(int, parts[1].split()))
+        neighbors = list(map(int, parts[1].split(', ')))
         graph[node] = neighbors
     return graph
 
