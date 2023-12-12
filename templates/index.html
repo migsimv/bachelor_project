@@ -188,7 +188,12 @@
             <label for="digit">k:</label>
             <input value='2' type="number" name="digit" id="digit" required>
             <br><br>
-            <button class="submit" onclick="uploadFile()">Rasti šerdį</button>
+            <input type="checkbox" id="closureCof" name="closureCoef">
+            <label for="responsiveDesign">Apskaičiuoti lokalųjį closure koeficientą</label> 
+            <input type="checkbox" id="clusteringCof" name="clusteringCof">
+            <label for="responsiveDesign">Apskaičiuoti klasterizacijos koeficientą</label> 
+            <br><br>
+            <button class="submit" onclick="uploadFile()">Rasti šerdį</button>   
         </form>
         <br>
     </div>

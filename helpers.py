@@ -3,6 +3,8 @@ import matplotlib
 matplotlib.use('TkAgg')
 import random
 import math
+import networkx as nx
+import itertools
 
 def get_files_in_uploads_folder():
     uploads_folder = "uploads"  
@@ -113,3 +115,21 @@ def findConnectedActors(x, graph):
     for i in range(x):
         new_graph[i] = list({n for neighbor in graph[i] for n in neighbors.get(neighbor, {}) if n != i})
     return new_graph
+
+def calculate_local_closure_coefficient(G, node): 
+    neighbors = nx.neighbors(G, node)
+    neighbor_pairs = list(itertools.combinations(neighbors, 2))
+    closed_pairs = [pair for pair in neighbor_pairs if G.has_edge(pair[0], pair[1])]
+    if len(closed_pairs) != 0:
+        closure_ratio = round((len(closed_pairs) / len(neighbor_pairs)), 4)
+    else:
+        closure_ratio = 0
+    return closure_ratio
+
+def calculate_average_closure_coefficient(local_closure_coefficients):
+
+    if local_closure_coefficients:
+        return sum(local_closure_coefficients) / len(local_closure_coefficients)
+    else:
+        return 0
+

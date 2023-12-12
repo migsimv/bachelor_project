@@ -220,11 +220,17 @@
                     {% endfor %}
                 </select>
                 <br><br>
+                
             </div>
             <label for="digit">k:</label>
             <input value='2' type="number" name="digit" id="digit" required>
             <br><br>
-            <button class="submit" onclick="uploadFile()">Rasti šerdį</button>
+            <input type="checkbox" id="closureCof" name="closureCoef">
+            <label for="responsiveDesign">Apskaičiuoti lokalųjį closure koeficientą</label> 
+            <input type="checkbox" id="clusteringCof" name="clusteringCof">
+            <label for="responsiveDesign">Apskaičiuoti klasterizacijos koeficientą</label> 
+            <br><br>
+            <button class="submit" onclick="uploadFile()">Rasti šerdį</button>   
         </form>
         <br>
     </div>
@@ -242,6 +248,24 @@
             {% endfor %}
         </div>
         <br>
+        {% if data.closure_coef_org %}
+            <div  class="left-column"> 
+                <b>Average closure coefficient is: {{ data['average_closure_org'] }}</b><br>
+                <b>Average clustering coefficient is: NaN</b><br>
+                {% for key, value in data.closure_coef_org.items() %}
+                    <p>Virsunes {{ key }} closure koef.: {{ value }}, klast. koef: NaN</p>
+                {% endfor %}
+            </div>
+            <div class= "right-column">
+                <b>Average closure coefficient is: {{ data['average_closure_cor'] }}</b><br>
+                <b>Average clustering coefficient is: NaN</b><br>
+                {% for key, value in data.closure_coef_cor.items() %}
+                    <p>virsunes {{ key }} closure koef.: {{ value }}, klast. koef: NaN</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <br>
         <div class ="linijai"> </div>
         <div class="row">
             <div class="column"  >
@@ -256,7 +280,6 @@
                 <h2>Viršūnių skaičius: {{ data['coreVertices'] }} </h2>
             </div>
           </div>
-        <br>
         <div class ="linijai"> </div>
         <h2>Histogramos</h2>
         <br>

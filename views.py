@@ -81,7 +81,8 @@ def index():
             data = get_result_from_adj_list(graph, k)
             data['k'] = k
             data['originalGraph'] =  helpers.getResult(graph)
-
+            print((data['originalGraph']))
+            print(graph)
             degreesArray = []
             for key, value in graph.items():
                 degreesArray.append(len(value))
@@ -90,9 +91,30 @@ def index():
                 coreDegreesArray.append(len(value))
             data['plot_filename1'] = generate_plot(degreesArray, 'Aktorių grafo viršūnių laipsniai')
             data['plot_filename2'] = generate_plot(coreDegreesArray, 'Šerdies viršūnių laipsniai')
+            closure_coef_checked = request.form.get('closureCoef') == 'on'
             
+            if closure_coef_checked:
+                data['closure_coef_org'] = get_closure_coef(graph)
+                data['closure_coef_cor'] = get_closure_coef(data["core"])
+                data['average_closure_org'] = helpers.calculate_average_closure_coefficient( data['closure_coef_org'])
+                data['average_closure_cor'] = helpers.calculate_average_closure_coefficient( data['closure_coef_cor'])
+
             return render_template('res.html', files=files, data=data)
     return render_template('index.html', files = files)
+
+def get_closure_coef(graph):
+    G = nx.Graph()
+    G.add_nodes_from(graph.keys())
+    for source, targets in graph.items():
+        for target in targets:
+            G.add_edge(source, target)
+    closure_coffs = []
+    closure = {}
+    for node in G.nodes():
+        closure_coefficient = helpers.calculate_local_closure_coefficient(G, node)
+        closure_coffs.append(closure_coefficient)
+        closure[node] = closure_coefficient
+    return closure
 
 def generate_plot(arr, subtitle):
     with plot_lock:
