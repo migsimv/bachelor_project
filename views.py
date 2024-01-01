@@ -48,6 +48,7 @@ def get_result_from_adj_list(graph, k):
 @views.route('/', methods=['GET', 'POST'])
 def index():
     files = helpers.get_files_in_uploads_folder()
+    santykis = 0
     if request.method == 'POST':
             if request.form['options'] == 'option1': #getting graph
                 if request.form.get('selected_file'):
@@ -70,6 +71,7 @@ def index():
                 yArray = [yWeight for _ in range(yLen)]
                 bipartiteGraph = helpers.create_bipartite_graph(xArray, yArray, alpha)
                 graph = helpers.findConnectedActors(xLen, bipartiteGraph) #actorsGraph
+                santykis = round((xWeight/yWeight), 4)
             else:
                 xArray = [int(value.strip()) for value in (request.form.get('xArray')).split(",")]
                 yArray = [int(value.strip()) for value in (request.form.get('yArray')).split(",")]
@@ -79,6 +81,8 @@ def index():
             #working with the graph
             k = request.form['digit']
             data = get_result_from_adj_list(graph, k)
+            if santykis != 0:
+                data['santykis'] = santykis
             data['k'] = k
             data['originalGraph'] =  helpers.getResult(graph)
             print((data['originalGraph']))
@@ -92,29 +96,38 @@ def index():
             data['plot_filename1'] = generate_plot(degreesArray, 'Aktorių grafo viršūnių laipsniai')
             data['plot_filename2'] = generate_plot(coreDegreesArray, 'Šerdies viršūnių laipsniai')
             closure_coef_checked = request.form.get('closureCoef') == 'on'
-            
+
             if closure_coef_checked:
-                data['closure_coef_org'] = get_closure_coef(graph)
-                data['closure_coef_cor'] = get_closure_coef(data["core"])
+                graph_cof = get_coefs(graph)
+                cor_cof = get_coefs(data["core"])
+                data['clust_coef_org'] = graph_cof[0]
+                data['clust_coef_cor'] = cor_cof[0]
+                data['average_clust_org'] = helpers.calculate_average_closure_coefficient( data['clust_coef_org'])
+                data['average_clust_cor'] = helpers.calculate_average_closure_coefficient( data['clust_coef_cor'])
+
+                data['closure_coef_org'] = graph_cof[1]
+                data['closure_coef_cor'] = cor_cof[1]
                 data['average_closure_org'] = helpers.calculate_average_closure_coefficient( data['closure_coef_org'])
                 data['average_closure_cor'] = helpers.calculate_average_closure_coefficient( data['closure_coef_cor'])
 
             return render_template('res.html', files=files, data=data)
     return render_template('index.html', files = files)
 
-def get_closure_coef(graph):
+def get_coefs(graph):
     G = nx.Graph()
     G.add_nodes_from(graph.keys())
     for source, targets in graph.items():
         for target in targets:
             G.add_edge(source, target)
-    closure_coffs = []
+
+    clustering = {}
     closure = {}
     for node in G.nodes():
-        closure_coefficient = helpers.calculate_local_closure_coefficient(G, node)
-        closure_coffs.append(closure_coefficient)
+        clustering_coefficient = helpers.calculate_local_clustering_coefficient(G, node)
+        closure_coefficient =  helpers.calculate_local_closure_coefficient(G, node)
+        clustering[node] = clustering_coefficient
         closure[node] = closure_coefficient
-    return closure
+    return [clustering, closure]
 
 def generate_plot(arr, subtitle):
     with plot_lock:

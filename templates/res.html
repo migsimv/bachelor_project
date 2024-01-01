@@ -226,9 +226,7 @@
             <input value='2' type="number" name="digit" id="digit" required>
             <br><br>
             <input type="checkbox" id="closureCof" name="closureCoef">
-            <label for="responsiveDesign">Apskaičiuoti lokalųjį closure koeficientą</label> 
-            <input type="checkbox" id="clusteringCof" name="clusteringCof">
-            <label for="responsiveDesign">Apskaičiuoti klasterizacijos koeficientą</label> 
+            <label for="responsiveDesign">Apskaičiuoti lokalųjį closure ir klasterizacijos koeficientą</label> 
             <br><br>
             <button class="submit" onclick="uploadFile()">Rasti šerdį</button>   
         </form>
@@ -250,19 +248,32 @@
         <br>
         {% if data.closure_coef_org %}
             <div  class="left-column"> 
-                <b>Average closure coefficient is: {{ data['average_closure_org'] }}</b><br>
-                <b>Average clustering coefficient is: NaN</b><br>
-                {% for key, value in data.closure_coef_org.items() %}
-                    <p>Virsunes {{ key }} closure koef.: {{ value }}, klast. koef: NaN</p>
-                {% endfor %}
+                <b>Vidutinis klast. koeficientas: {{ data['average_closure_org'] }}</b><br>
+                <b>Vidutinis closure. koeficientas: {{ data['average_clust_org'] }}</b><br>
+                <!-- <b>Svorių santykis: {{ data['average_closure_org'] }}</b><br> -->
+                {% for key, closure_coef in data.closure_coef_org.items() %}
+                     Virsunes {{ key }} closure koef.: {{ closure_coef }}
+                    {% if key in data.clust_coef_org %}
+                        Clust. koef.: {{ data.clust_coef_org[key] }}
+                {% endif %}
+                <br>
+            {% endfor %}
             </div>
             <div class= "right-column">
-                <b>Average closure coefficient is: {{ data['average_closure_cor'] }}</b><br>
-                <b>Average clustering coefficient is: NaN</b><br>
+                <b>Vidutinis klast. koeficientas: {{ data['average_closure_cor'] }}</b><br>
+                <b>Vidutinis closure. koeficientas: {{ data['average_clust_cor'] }}</b><br>
+                <!-- <b>Svorių santykis: {{ data['average_closure_org'] }}</b><br> -->
                 {% for key, value in data.closure_coef_cor.items() %}
-                    <p>virsunes {{ key }} closure koef.: {{ value }}, klast. koef: NaN</p>
+                    virsunes {{ key }} closure koef.: {{ value }} 
+                    {% if key in data.clust_coef_org %}
+                    Clust. koef.: {{ data.clust_coef_cor[key] }}
+                    {% endif %}
+                    <br>
                 {% endfor %}
             </div>
+        {% endif %}
+        {% if data.santykis %}
+            <h2>Santykis: {{data.santykis}}</h2>
         {% endif %}
 
         <br>

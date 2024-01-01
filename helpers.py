@@ -116,20 +116,36 @@ def findConnectedActors(x, graph):
         new_graph[i] = list({n for neighbor in graph[i] for n in neighbors.get(neighbor, {}) if n != i})
     return new_graph
 
-def calculate_local_closure_coefficient(G, node): 
+def calculate_local_clustering_coefficient(G, node): 
     neighbors = nx.neighbors(G, node)
     neighbor_pairs = list(itertools.combinations(neighbors, 2))
     closed_pairs = [pair for pair in neighbor_pairs if G.has_edge(pair[0], pair[1])]
     if len(closed_pairs) != 0:
-        closure_ratio = round((len(closed_pairs) / len(neighbor_pairs)), 4)
+        return  round((len(closed_pairs) / len(neighbor_pairs)), 3)
     else:
-        closure_ratio = 0
-    return closure_ratio
+        return 0
+
+def calculate_local_closure_coefficient(G, node): 
+    triangles = nx.triangles(G, node)
+    wedges =count_2_edge_paths_starting_from_node(G, node)
+    if triangles == 0 or wedges == 0:
+        return 0
+    else:
+        return round((2 * triangles / wedges), 3)
+
 
 def calculate_average_closure_coefficient(local_closure_coefficients):
 
     if local_closure_coefficients:
-        return sum(local_closure_coefficients) / len(local_closure_coefficients)
+        return round (sum(local_closure_coefficients.values()) / len(local_closure_coefficients), 5)
     else:
         return 0
+        
+def count_2_edge_paths_starting_from_node(graph, start_node):
+    neighbors = list(graph.neighbors(start_node))
+    sum_degrees = 0
 
+    for neighbor in neighbors:
+        sum_degrees += graph.degree(neighbor) - 1
+
+    return sum_degrees
