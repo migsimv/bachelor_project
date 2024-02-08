@@ -32,7 +32,6 @@ def getCore(graph, k):
         for i in range(len(graph)):
             if degrees[i] < int(k) and degrees[i] > 0:
                 for neighbor in core[i]:
-                    print(i)
                     core[neighbor].remove(i)
                     degrees[neighbor] -= 1
                 core.pop(i)

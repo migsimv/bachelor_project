@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request
 import helpers
 import matplotlib
-matplotlib.use('Agg') 
+# matplotlib.use('Agg')  # su situo neprintina lokaliai
 from matplotlib import pyplot as plt
 import time
 import numpy as np
