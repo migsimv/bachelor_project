@@ -91,8 +91,8 @@
             <label for="options">Pasirinkite pradinių duomenų tipą</label>
             <select id="options" name="options">
                 <option value="option1">1. Gretimų kaimynių sąrašas</option>
-                <option value="option2">2. Aktorių ir atributų skaičius su vienodais svoriais</option>
-                <option value="option3">3. Aktorių ir atributų svoriai</option>
+                <option value="option2">2. Sukuriamas grafas pagal nurodytus svorius</option>
+                <option value="option3">3. Sukuriamas grafas pagal generuojamus svorius</option>
             </select>
             <br><br>
             <div id="integerForm" class="hidden">
@@ -100,17 +100,30 @@
                 <label for="integerValue">Aktorių skaičius:</label>
                 <input type="number" id="xLen" name="xLen"required>           
                 <br>
-                <label for="integerValue2">Aktorių svoriai: </label>
-                <input type="number" id="xWeight" name="xWeight" required>
+                <label for="integerValue2">Aktorių a reiksme </label>
+                <input type="number" id="xa" name="xa" required>
+                <br>
+                <label for="integerValue2">Aktorių beta </label>
+                <input type="number" id="xbeta" name="xbeta" required>
                 <br>
                 <label for="integerValue2">Atributų skaičius:</label>
                 <input type="number" id="yLen" name="yLen" required>
                 <br>
-                <label for="integerValue4">Atributų svoriai: </label>
-                <input type="number" id="yWeight" name="yWeight" required>
+                <label for="integerValue2">Atributų a reiksme </label>
+                <input type="number" id="ya" name="ya" required>
+                <br>
+                <label for="integerValue2">Atributų beta </label>
+                <input type="number" id="ybeta" name="ybeta" required>
+                <br>
                 <br>
                 α: 
-                <input type="number" id="alpha" name="alpha" step="0.01">
+                <input type="number" id="alpha" name="alpha" step="0.01"> <br>
+                <label for="socNet">Soc. tinklo modelis: </label>
+                
+                <select id="socNet" name="socNet">
+                    <option value="model1">Modelis I</option>
+                    <option value="model2">Modelis II</option>
+                </select>
                 <br> <br>
             </div>
             <div id="listForm" class="hidden">
@@ -119,9 +132,14 @@
                 <textarea id="xArray" name="xArray" rows="4" style="height: 100px;" required></textarea>
                 <br>
                 <label for="integerValue2">Atributų svoriai: </label>
-                <textarea id="yArray" name="yArray" rows="4"  style="height: 100px;" required></textarea>
+                <textarea id="yArray" name="yArray" rows="4"  style="height: 100px;" required></textarea> <br>
                 α: 
-                <input type="number" id="alpha2" name="alpha2" step="0.01">
+                <input type="number" id="alpha2" name="alpha2" step="0.01"> <br>
+                <label for="socNet">Soc. tinklo modelis: </label>
+                <select id="socNet" name="socNet">
+                    <option value="model1">Modelis I</option>
+                    <option value="model2">Modelis II</option>
+                </select>
                 <br> <br>
             </div>
 
@@ -132,14 +150,14 @@
                     var listForm = document.getElementById("listForm");
                     var listFormPrev = document.getElementById("listFormPrev");
 
-                    if (selectedOption === "option2") {
+                    if (selectedOption === "option3") {
                         integerForm.classList.remove("hidden");
                         listFormPrev.classList.add("hidden");
                         listForm.classList.add("hidden");
                         enableRequiredFields(integerForm);
                         disableRequiredFields(listForm);
                     } 
-                    else if(selectedOption === "option3"){
+                    else if(selectedOption === "option2"){
                         integerForm.classList.add("hidden");
                         listFormPrev.classList.add("hidden");
                         listForm.classList.remove("hidden");
@@ -189,7 +207,7 @@
             <input value='2' type="number" name="digit" id="digit" required>
             <br><br>
             <input type="checkbox" id="closureCof" name="closureCoef">
-            <label for="responsiveDesign">Apskaičiuoti lokalųjį closure ir klasterizacijos koeficientą</label> 
+            <label for="responsiveDesign">Apskaičiuoti lokalųjį uždarymo ir klasterizacijos koeficientą</label> 
             <br><br>
             <button class="submit" onclick="uploadFile()">Rasti šerdį</button>   
         </form>
@@ -197,22 +215,21 @@
     </div>
 
     <div class="text-area-container">
-      <h1>Grafo k - šerdies radimas</h1>
+      <h1>Grafo k - šerdies radimo įrankis</h1>
       <div class="test">
         <b>Kas tai?</b>
-        <br> Šis įrankis yra skirtas grafo šerdies radimui. Galima ieškoti grafo šerdies pagal gretimų viršūnių sąrašą arba galima susikonstruoti socialinį tinklą, 
-            jo generavimui paduodami tik viršūnių svoriai ir nurodomas kintamasis α, kuo didesnė α reikšmė, tuo grafas bus jungesnis. 
+        <br> Šis įrankis yra skirtas grafo šerdies radimui. Grafą galima pateikti naudojantis gretimų viršūnių sąrašu arba įrankis gali jį sukonstruoti pagal atsitiktinio 
+            grafo modelį: atsitiktinį sankirtų grafą arba atsitiktinį dvišalį grafą.
         <br><br><b>Naudojimas: </b><br>
         <dt> 1. Pasirenkamas pradinių duomenų tipas:</dt>
-        <dd> I. Gretimų kaimynių sąrašas - reikia pasirinkti failą (anksčiau naudotas failą galima rasti "Anksčiau naudoti failai" sąraše).
+        <dd> I. "Gretimų kaimynių sąrašas" - reikia pasirinkti failą (anksčiau naudotas failą galima rasti "Anksčiau naudoti failai" sąraše).
                 Kiekviena viršūnė aprašoma nauja eilute, pvz: '1 -> 4, 5, 7', čia 1 - viršūnės pavadinimas, o 4, 5, 7 yra jos kaimynės. </dd>
-        <dd > II. Aktorių ir atributų skaičius su vienodais svoriais - nurodomas aktorių skaičius ir jų svoris bei atributų skaičius ir jų svoris. Taip pat nurodoma 
-                 α reikšmė, pagal šį kintamajį kis grafo jungumas, kuo α didesnis, tuo grafas bus jungesnis. </dd>
-        <dd>III. Aktorių ir atributų sąrašai su svoriais - įvedami du sąrašai: vienas aktorių svoriams, kitas atributų svoriams. Kiekvienas skaičius atitinka 
-           tos pozicijos viršūnės svorį. Taip pat nurodoma  α reikšmė, pagal šį kintamajį kis grafo jungumas, kuo α didesnis, tuo grafas bus jungesnis.</dd>
-        <b> + II ir III tipai sukuria dvidalį grafą pagal duotus svorius bei α reikšmę (kuo α didesnis, tuo grafas bus jungesnis), o iš to dvidalio grafo 
-                gaunamas socialinis tinklas (aktorių grafas), kurio viršūnės bus jungios jei turės bendrų atributų. Rezultate yra nagrinėjamas socialinio tinklo šerdis.</b>
-        <br>
+        <dd > II. "Sukuriamas grafas pagal nurodytus svorius" -įvedami du sąrašai: vienas aktorių svoriams, kitas atributų svoriams. Kiekvienas skaičius atitinka 
+            tos pozicijos viršūnės svorį. Taip pat nurodoma  α reikšmė, pagal šį kintamajį kis grafo jungumas, kuo α didesnis, tuo grafas bus jungesnis. Nurodomas modelis pagal kurį bus konstruojamas grafas.
+            Modelis I - nehomogeninio atsitiktinio sankirtų grafo modelis, modelis II - atsitiktinio konfiguracijų sankirtų grafo modelis.</dd>
+        <dd>III. Aktorių ir atributų sąrašai su svoriais - nurodomas aktorių skaičius ir jų svoris bei atributų skaičius ir jų svoris. Taip pat nurodoma 
+            α reikšmė, pagal šį kintamajį kis grafo jungumas, kuo α didesnis, tuo grafas bus jungesnis. Nurodomas modelis pagal kurį bus konstruojamas grafas.
+            Modelis I - nehomogeninio atsitiktinio sankirtų grafo modelis, modelis II - atsitiktinio konfiguracijų sankirtų grafo modelis. </dd>
         2. Pasirinkite k.
         <br>
         3. Spauskite mygtuką "Rasti šerdį"
@@ -220,7 +237,7 @@
         <b>Rezultatai: </b><br>
         1. Gretimų kaimynių sąrašas
         <br>
-        2. Viršūnių laipsnių histograma paal viršūnės skaičių.
+        2. Viršūnių laipsnių histograma pagal viršūnės skaičių.
         <br>
         3. Informacija apie komponentes bei jų skaičių.
         <br>

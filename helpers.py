@@ -87,19 +87,51 @@ def getGraph(decoded_lines):
         neighbors = list(map(int, parts[1].split(', ')))
         graph[node] = neighbors
     return graph
+        
+def calculate_weights(xm, alpha, length):
+    res = []
+    # random.seed(14)
+    for vertice in range(length):
+        weight = xm / (pow(random.random(), 1/alpha))
+        res.append(weight)
+    return res
 
-def create_bipartite_graph(xArray, yArray, alpha):
+def create_bipartite_graph(xArray, yArray, alpha, socModel):
     V = len(xArray) + len(yArray)
     # random.seed(42)
+    print("AAAAA")
+    print(socModel)
     adj_list = [[] for i in range(V)]
-    for i in range(len(xArray)):
-        f = 0
-        for j in range(len(xArray), V):
-            p = getP(alpha, xArray[i], yArray[f], len(xArray), len(yArray))
-            if random.random() < p:
-                adj_list[i].append(j)
-                adj_list[j].append(i)
-            f += 1
+    if socModel == 'model1':
+        print("AAAA")
+        for i in range(len(xArray)):
+            f = 0
+            for j in range(len(xArray), V):
+                p = getP(alpha, xArray[i], yArray[f], len(xArray), len(yArray))
+                if random.random() < p:
+                    adj_list[i].append(j)
+                    adj_list[j].append(i)
+                f += 1
+    elif socModel == 'model2':
+        adjusted_xArray = [int(x) for x in xArray]
+        adjusted_yArray = [int(y) for y in yArray]
+        sum_x = sum(adjusted_xArray)
+        sum_y = sum(adjusted_yArray)
+        while sum_x != sum_y:
+            if sum_x > sum_y:
+                index_to_remove =  random.randint(0, len(adjusted_xArray) - 1)
+                adjusted_xArray.pop(index_to_remove)
+                sum_x = sum(adjusted_xArray)
+            else:
+                index_to_remove = random.randint(0, len(adjusted_yArray) - 1)
+                adjusted_yArray.pop(index_to_remove)
+                sum_y = sum(adjusted_yArray)
+            
+        for i in range(len(adjusted_xArray)):
+            for j in range(len(adjusted_xArray), len(adjusted_xArray) + len(adjusted_yArray)):
+                if random.choice([True, False]):
+                    adj_list[i].append(j)
+                    adj_list[j].append(i)
     return adj_list
 
 def getP(alpha,x,y,n,m):
@@ -148,3 +180,18 @@ def count_2_edge_paths_starting_from_node(graph, start_node):
         sum_degrees += graph.degree(neighbor) - 1
 
     return sum_degrees
+
+def calculate_tankis(graph):
+    virsuniu_laipsniai = calculate_degrees(graph)
+    visos_poros = len(graph) * len(graph)
+    laipsniu_suma = 0
+    for laipsnis in virsuniu_laipsniai:
+        laipsniu_suma += laipsnis
+    if laipsniu_suma:
+        return round((laipsniu_suma / 2) / visos_poros, 8)
+    else: 
+        return 0
+    
+def calculate_degrees(graph):
+    degrees = [len(neighbors) for neighbors in graph.values()]
+    return degrees

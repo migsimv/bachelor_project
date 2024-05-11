@@ -61,32 +61,36 @@ def index():
                         decoded_line = line.decode('utf-8')  
                         decoded_lines.append(decoded_line.strip()) 
                 graph = helpers.getGraph(decoded_lines)
-            elif request.form['options'] == 'option2':
+            elif request.form['options'] == 'option3':
+                socModel =  str(request.form.get('socNet'))
                 xLen =  int(request.form.get('xLen'))
-                xWeight =  int(request.form.get('xWeight'))
                 yLen =  int(request.form.get('yLen'))
-                yWeight =  int(request.form.get('yWeight'))
+                
+                xa =  int(request.form.get('xa'))
+                xbeta =  int(request.form.get('xbeta'))
+                ya =  int(request.form.get('ya'))
+                ybeta =  int(request.form.get('ybeta'))
+
                 alpha = float(request.form.get('alpha'))
-                xArray = [xWeight for _ in range(xLen)]
-                yArray = [yWeight for _ in range(yLen)]
-                bipartiteGraph = helpers.create_bipartite_graph(xArray, yArray, alpha)
+                xArray = helpers.calculate_weights(xa, xbeta, xLen)
+                yArray = helpers.calculate_weights(ya, ybeta, yLen)
+                bipartiteGraph = helpers.create_bipartite_graph(xArray, yArray, alpha, socModel)
                 graph = helpers.findConnectedActors(xLen, bipartiteGraph) #actorsGraph
-                santykis = round((xWeight/yWeight), 4)
-            else:
+            elif request.form['options'] == 'option2':
+                socModel =  str(request.form.get('socNet'))
+                print(socModel)
                 xArray = [int(value.strip()) for value in (request.form.get('xArray')).split(",")]
                 yArray = [int(value.strip()) for value in (request.form.get('yArray')).split(",")]
                 alpha = float(request.form.get('alpha2'))
-                bipartiteGraph = helpers.create_bipartite_graph(xArray, yArray, alpha)
+                bipartiteGraph = helpers.create_bipartite_graph(xArray, yArray, alpha, socModel)
                 graph = helpers.findConnectedActors(len(xArray), bipartiteGraph) #actorsGraph
             #working with the graph
             k = request.form['digit']
             data = get_result_from_adj_list(graph, k)
-            if santykis != 0:
-                data['santykis'] = santykis
             data['k'] = k
             data['originalGraph'] =  helpers.getResult(graph)
-            print((data['originalGraph']))
-            print(graph)
+            # print((data['originalGraph']))
+            # print(graph)
             degreesArray = []
             for key, value in graph.items():
                 degreesArray.append(len(value))
@@ -104,11 +108,14 @@ def index():
                 data['clust_coef_cor'] = cor_cof[0]
                 data['average_clust_org'] = helpers.calculate_average_closure_coefficient( data['clust_coef_org'])
                 data['average_clust_cor'] = helpers.calculate_average_closure_coefficient( data['clust_coef_cor'])
+                data['grafo_tankis'] = helpers.calculate_tankis(graph)
 
                 data['closure_coef_org'] = graph_cof[1]
                 data['closure_coef_cor'] = cor_cof[1]
                 data['average_closure_org'] = helpers.calculate_average_closure_coefficient( data['closure_coef_org'])
                 data['average_closure_cor'] = helpers.calculate_average_closure_coefficient( data['closure_coef_cor'])
+                data['serdies_tankis'] = helpers.calculate_tankis(data["core"])
+
 
             return render_template('res.html', files=files, data=data)
     return render_template('index.html', files = files)
