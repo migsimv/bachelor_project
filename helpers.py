@@ -1,10 +1,14 @@
+from collections import defaultdict
 import os
 import matplotlib
 matplotlib.use('TkAgg')
 import random
 import math
+import sys
 import networkx as nx
 import itertools
+sys.setrecursionlimit(5000)
+
 
 def get_files_in_uploads_folder():
     uploads_folder = "uploads"  
@@ -90,7 +94,6 @@ def getGraph(decoded_lines):
         
 def calculate_weights(xm, alpha, length):
     res = []
-    # random.seed(14)
     for vertice in range(length):
         weight = xm / (pow(random.random(), 1/alpha))
         res.append(weight)
@@ -98,12 +101,9 @@ def calculate_weights(xm, alpha, length):
 
 def create_bipartite_graph(xArray, yArray, alpha, socModel):
     V = len(xArray) + len(yArray)
-    # random.seed(42)
-    print("AAAAA")
-    print(socModel)
+
     adj_list = [[] for i in range(V)]
     if socModel == 'model1':
-        print("AAAA")
         for i in range(len(xArray)):
             f = 0
             for j in range(len(xArray), V):
@@ -114,24 +114,49 @@ def create_bipartite_graph(xArray, yArray, alpha, socModel):
                 f += 1
     elif socModel == 'model2':
         adjusted_xArray = [int(x) for x in xArray]
+
         adjusted_yArray = [int(y) for y in yArray]
-        sum_x = sum(adjusted_xArray)
-        sum_y = sum(adjusted_yArray)
-        while sum_x != sum_y:
-            if sum_x > sum_y:
-                index_to_remove =  random.randint(0, len(adjusted_xArray) - 1)
-                adjusted_xArray.pop(index_to_remove)
-                sum_x = sum(adjusted_xArray)
+        sum_top = sum(adjusted_xArray)
+        sum_bottom = sum(adjusted_yArray)
+        print(sum_top)
+        print(sum_bottom)
+        while sum_top != sum_bottom:
+            if sum_top > sum_bottom:
+                index_to_remove = random.randint(0, len(adjusted_xArray) - 1)
+                if adjusted_xArray[index_to_remove] > 0:
+                    adjusted_xArray[index_to_remove] -= 1
+                    sum_top -= 1
             else:
                 index_to_remove = random.randint(0, len(adjusted_yArray) - 1)
-                adjusted_yArray.pop(index_to_remove)
-                sum_y = sum(adjusted_yArray)
-            
-        for i in range(len(adjusted_xArray)):
-            for j in range(len(adjusted_xArray), len(adjusted_xArray) + len(adjusted_yArray)):
-                if random.choice([True, False]):
-                    adj_list[i].append(j)
-                    adj_list[j].append(i)
+                if adjusted_yArray[index_to_remove] > 0:
+                    adjusted_yArray[index_to_remove] -= 1
+                    sum_bottom -= 1
+        
+        top_vertices = list(range(len(adjusted_xArray)))
+        bottom_vertices = list(range(len(adjusted_yArray)))
+        print(sum_top)
+        print(sum_bottom)
+        # Create connection points
+        top_connection_points = []
+        bottom_connection_points = []
+        
+        for vertex, degree in zip(top_vertices, adjusted_xArray):
+            top_connection_points.extend([vertex] * degree)
+        
+        for vertex, degree in zip(bottom_vertices, adjusted_yArray):
+            bottom_connection_points.extend([vertex + len(adjusted_xArray)] * degree)
+        
+        # Shuffle connection points
+        random.shuffle(top_connection_points)
+        random.shuffle(bottom_connection_points)
+        
+        # Create adjacency list
+        adj_list = defaultdict(list)
+        
+        for top_point, bottom_point in zip(top_connection_points, bottom_connection_points):
+            adj_list[top_point].append(bottom_point)
+            adj_list[bottom_point].append(top_point)
+        
     return adj_list
 
 def getP(alpha,x,y,n,m):

@@ -6,10 +6,11 @@ import networkx as nx
 from matplotlib import pyplot as plt
 from datetime import datetime  # Importing datetime module
 import os 
+random.seed(42)
 
-n = [100, 1000, 5000, 10000] #aktoriai
-m = [100, 1000, 5000, 10000] #atributai
-
+n = [2000] #aktoriai
+m = [100, 500, 1000,2000, 3000, 5000] #atributai
+# k = [0, 1, 2, 3, 4, 5,6, 7, 8, 9, 10]
 
 def svoriu_histograma(arr, subtitle, size):
     interval_size = size / 10
@@ -17,8 +18,7 @@ def svoriu_histograma(arr, subtitle, size):
     
     x = np.arange(0, size, interval_size)
     plt.xticks(x)
-    plt.yticks([])  
-
+    plt.yticks([])      
 
     counts, edges, bars = plt.hist(arr, intervals, edgecolor='k')
     plt.bar_label(bars)
@@ -28,14 +28,15 @@ def svoriu_histograma(arr, subtitle, size):
 
     # new code to save
     results_dir = os.path.join(os.getcwd(), 'results')
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
 
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     filename = os.path.join(results_dir, f'histogram_{timestamp}.png')
-
+    
     plt.savefig(filename)
-       
     plt.show()
-    plt.close()   
+    plt.close() 
 
 
 def generate_hist(arr, subtitle, size):
@@ -55,15 +56,13 @@ def generate_hist(arr, subtitle, size):
  
     results_dir = os.path.join(os.getcwd(), 'results')
 
-    # Generate unique filename using timestamp
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     filename = os.path.join(results_dir, f'histogram_{timestamp}.png')
 
-    # Save the histogram to the results directory
     plt.savefig(filename)
     # plt.show()
 
-    plt.close()  # Close the figure after saving
+    plt.close()  
 
 
 def calculate_average_closure_coefficient(local_closure_coefficients, vertices):
@@ -74,7 +73,7 @@ def calculate_average_closure_coefficient(local_closure_coefficients, vertices):
         
 def calculate_weights(xm, alpha, length):
     res = []
-    # random.seed(14)
+    random.seed(42)
     for vertice in range(length):
         weight = xm / (pow(random.random(), 1/alpha))
         res.append(weight)
@@ -87,7 +86,7 @@ def calculate_degrees(graph):
 
 def calculate_tankis(graph):
     virsuniu_laipsniai = calculate_degrees(graph)
-    visos_poros = len(graph) * len(graph)
+    visos_poros = len(graph) * (len(graph) - 1)
     laipsniu_suma = 0
     for laipsnis in virsuniu_laipsniai:
         laipsniu_suma += laipsnis
@@ -102,104 +101,119 @@ rez_og_tankis = []
 rez_core_clust = []
 rez_core_closure = []
 rez_core_tankis = []
+            
 
 for aktorius in n:
+
     print("aktoriu skaicius:", aktorius)
     for atributas in m:
         print("atributu skaicius:", atributas)
-        for i in range(5):
-            k=2
-            actorGraph = []
-            core = []
-            aktoriu_svoriai = []
-            atributu_svoriai = []
-            print("TEST: ", i)
+        for i in range(1):
+            for k in  [2]:
+                print("k: ", k)
+                graphComponents = 0
+                coreComponents = 0
+                graphMaxComp =0
+                coreMaxComp = 0
+                actorGraph = []
+                core = []
+                aktoriu_svoriai = []
+                atributu_svoriai = []
+                print("TEST: ", i)
+                aktoriu_svoriai = calculate_weights(1.5, 4, aktorius)									
+                atributu_svoriai = calculate_weights(2, 3,atributas)									
+                bipartite = helpers.create_bipartite_graph(aktoriu_svoriai, atributu_svoriai, 0.1, 'model2')									
 
-            aktoriu_svoriai = calculate_weights(2, 4, aktorius)
-            atributu_svoriai = calculate_weights(4, 6, atributas)
-            # print(max(aktoriu_svoriai))
-            # print(max(atributu_svoriai))
-            bipartite = helpers.create_bipartite_graph(aktoriu_svoriai, atributu_svoriai, 0.1)
-            actorGraph = helpers.findConnectedActors(aktorius, bipartite)
+                actorGraph = helpers.findConnectedActors(aktorius, bipartite)
 
-            #grafo skaiciavimai
-            coefs_og = views.get_coefs(actorGraph)
-            avg_clust_og = calculate_average_closure_coefficient(coefs_og[0], len(actorGraph))
-            avg_closure_og = calculate_average_closure_coefficient(coefs_og[1], len(actorGraph))
-            tankis_og = calculate_tankis(actorGraph)
+                    
+                graphComponents = helpers.find_components(actorGraph)
+                graphMaxComp = helpers.longest_inner_array_length(graphComponents)
+                #grafo skaiciavimai
+                coefs_og = views.get_coefs(actorGraph)
+                avg_clust_og = calculate_average_closure_coefficient(coefs_og[0], len(actorGraph))
+                avg_closure_og = calculate_average_closure_coefficient(coefs_og[1], len(actorGraph))
+                tankis_og = calculate_tankis(actorGraph)
+                #serdies skaiciavimai
+                core = helpers.getCore(actorGraph, k)
+                coreComponents = helpers.find_components(core)
+                coreMaxComp = helpers.longest_inner_array_length(coreComponents)
 
-            #serdies skaiciavimai
-            core = helpers.getCore(actorGraph, k)
-            coefs = views.get_coefs(core)
-            avg_clust_serdis = calculate_average_closure_coefficient(coefs[0], len(core))
-            avg_closure_serdis = calculate_average_closure_coefficient(coefs[1], len(core))
-            tankis_serdis = calculate_tankis(core)
-            rez_og_clust.append(avg_clust_og)
-            rez_og_closure.append(avg_closure_og)
-            rez_og_tankis.append(tankis_og)
-            rez_core_clust.append(avg_clust_serdis)
-            rez_core_closure.append(avg_closure_serdis)
-            rez_core_tankis.append(tankis_serdis)
+                coefs = views.get_coefs(core)
+                avg_clust_serdis = calculate_average_closure_coefficient(coefs[0], len(core))
+                avg_closure_serdis = calculate_average_closure_coefficient(coefs[1], len(core))
+                tankis_serdis = calculate_tankis(core)
+                rez_og_clust.append(avg_clust_og)
+                rez_og_closure.append(avg_closure_og)
+                rez_og_tankis.append(tankis_og)
+                rez_core_clust.append(avg_clust_serdis)
+                rez_core_closure.append(avg_closure_serdis)
+                rez_core_tankis.append(tankis_serdis)
+   
 
-            print("og ir serdies dydis: ", len(actorGraph), len(core))
-            print("og ir serdies  Clustering: ", avg_clust_og, avg_clust_serdis)
-            print("og ir serdies Closure: ", avg_closure_og, avg_closure_serdis)
-            print("og ir serdies TANKIS: ", tankis_og, tankis_serdis)
-            # if i == 1:
-            # aktoriu `svoriu histograma
-            svoriu_histograma(aktoriu_svoriai, 'Aktorių viršūnių svoriai', 10)
+                print("og ir serdies dydis: ", len(actorGraph), len(core))
+                print("og ir serdies  Clustering: ", avg_clust_og, avg_clust_serdis)
+                print("og ir serdies Closure: ", avg_closure_og, avg_closure_serdis)
+                print("og ir serdies TANKIS: ", tankis_og, tankis_serdis)
+                print("og ir serdies komp sk: ", len(graphComponents), len(coreComponents))
+                print("og ir serdies did komp: ", graphMaxComp, coreMaxComp)
+      
 
-            # atributu svoriu histograma
-            svoriu_histograma(atributu_svoriai, 'Atributų viršūnių svoriai', 10)
+                # if i == 1:
+                # aktoriu `svoriu histograma
+                # svoriu_histograma(aktoriu_svoriai, 'Aktorių viršūnių svoriai', 10)
 
-            # grafo laipsniu histograma
-            max_neighbors = 0
-            max_vertex = None
+                # # # atributu svoriu histograma
+                # svoriu_histograma(atributu_svoriai, 'Atributų viršūnių svoriai', 40)
 
-            for vertex, neighbors in actorGraph.items():
-                num_neighbors = len(neighbors)
-                if num_neighbors > max_neighbors:
-                    max_neighbors = num_neighbors
-                    max_vertex = vertex
-            print(max_neighbors)
-            rounded_max_neighbors = ((max_neighbors + 9) // 10) * 10  # Round to the nearest ten
+                # grafo laipsniu histograma
+                max_neighbors = 0
+                max_vertex = None
 
-            arr = calculate_degrees(actorGraph)
-            print(rounded_max_neighbors)
-            generate_hist(arr, 'Grafo viršūnių laipsniai, viršūnių skaičius =  {}'.format(len(actorGraph)), rounded_max_neighbors)
-            max_neighbors1 = 0
-            max_vertex1 = None
+                for vertex, neighbors in actorGraph.items():
+                    num_neighbors = len(neighbors)
+                    if num_neighbors > max_neighbors:
+                        max_neighbors = num_neighbors
+                        max_vertex = vertex
+                # print(max_neighbors)
+                rounded_max_neighbors = ((max_neighbors + 9) // 10) * 10  # Round to the nearest ten
 
-            for vertex1, neighbors1 in core.items():
-                num_neighbors1 = len(neighbors1)
-                if num_neighbors1 > max_neighbors1:
-                    max_neighbors1 = num_neighbors1
-                    max_vertex1 = vertex1
-            print(max_neighbors1)
-            rounded_max_neighbors1 = ((max_neighbors1 + 9) // 10) * 10  # Round to the nearest ten
+                arr = calculate_degrees(actorGraph)
+                # print(rounded_max_neighbors)
+                # generate_hist(arr, 'Grafo viršūnių laipsniai, viršūnių skaičius =  {}'.format(len(actorGraph)), rounded_max_neighbors)
+                max_neighbors1 = 0
+                max_vertex1 = None
 
-            # serdies laipsniu histograma
-            arr = calculate_degrees(core)
-            print(rounded_max_neighbors)
-            generate_hist(arr, 'Aktorių šerdies viršūnių laipsniai, viršūnių skaičius =  {}'.format(len(core)), rounded_max_neighbors1)
+                for vertex1, neighbors1 in core.items():
+                    num_neighbors1 = len(neighbors1)
+                    if num_neighbors1 > max_neighbors1:
+                        max_neighbors1 = num_neighbors1
+                        max_vertex1 = vertex1
+                # print(max_neighbors1)
+                rounded_max_neighbors1 = ((max_neighbors1 + 9) // 10) * 10  # Round to the nearest ten
+
+                # serdies laipsniu histograma
+                arr = calculate_degrees(core)
+                # print(rounded_max_neighbors)
+                # generate_hist(arr, 'Aktorių šerdies viršūnių laipsniai, viršūnių skaičius =  {}'.format(len(core)), rounded_max_neighbors1)
 
             
-print("og clust:")
-for o in rez_og_clust:
-    print(o)
-print("og closure:")
-for o in rez_og_closure:
-    print(o)
-print("og tankis:")
-for o in rez_og_tankis:
-    print(o)
+# print("og clust:")
+# for o in rez_og_clust:
+#     print(o)
+# print("og closure:")
+# for o in rez_og_closure:
+#     print(o)
+# print("og tankis:")
+# for o in rez_og_tankis:
+#     print(o)
 
-print("core clust:")
-for o in rez_core_clust:
-    print(o)
-print("core closure:")
-for o in rez_core_closure:
-    print(o)
-print("core tankis:")
-for o in rez_core_tankis:
-    print(o)
+# print("core clust:")
+# for o in rez_core_clust:
+#     print(o)
+# print("core closure:")
+# for o in rez_core_closure:
+#     print(o)
+# print("core tankis:")
+# for o in rez_core_tankis:
+#     print(o)

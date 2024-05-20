@@ -78,7 +78,7 @@ def index():
                 graph = helpers.findConnectedActors(xLen, bipartiteGraph) #actorsGraph
             elif request.form['options'] == 'option2':
                 socModel =  str(request.form.get('socNet'))
-                print(socModel)
+                # print(socModel)
                 xArray = [int(value.strip()) for value in (request.form.get('xArray')).split(",")]
                 yArray = [int(value.strip()) for value in (request.form.get('yArray')).split(",")]
                 alpha = float(request.form.get('alpha2'))
